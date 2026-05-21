@@ -1,4 +1,4 @@
-NAME            = ipe-simple-loop
+NAME            = ipe-otp
 OBJECTS         = generated_main.o output/generated_table.o output/generated_stubs.o
 
 AS              = msp430-as

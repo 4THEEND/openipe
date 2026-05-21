@@ -66,6 +66,17 @@ int main(void)
     return 0;
 }
 
+int IPE_ENTRY apply_rsa(int rsa_operation, int text){
+    if(rsa_operation == ENCODE){
+        return rsa_operation * text;
+    } 
+    else if(rsa_operation == DECODE)  {
+        return rsa_decode(text);
+    } else {
+        return -1;
+    }
+}
+
  __attribute__((section(".ipe_entry"))) int apply_rsa_internal(int rsa_operation, int text)
 {
   if (rsa_operation == 0)
