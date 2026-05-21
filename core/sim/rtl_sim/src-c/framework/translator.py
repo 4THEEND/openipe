@@ -73,7 +73,10 @@ class ArgumentRegCounter(c_ast.NodeVisitor):
         if isinstance(arg_type, c_ast.PtrDecl):
             self.reg_used += 2  # for restricted data model
         else:
-            self.reg_used += self.nb_reg_used(arg_type.type.names)
+            try:
+                self.reg_used += self.nb_reg_used(arg_type.type.names)
+            except AttributeError:
+                self.reg_used += self.nb_reg_used(arg_type.type.name)
 
 # register all ocalls in IPE function + redirect ocall to new stub
 class OcallCollector(c_ast.NodeVisitor):

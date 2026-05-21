@@ -24,3 +24,8 @@ int IPE_ENTRY apply_rsa(int op, int text){
     return 0;
 }
 
+ __attribute__((section(".ipe_entry"))) int apply_rsa_internal(int op, int text)
+{
+  return 0;
+}
+
