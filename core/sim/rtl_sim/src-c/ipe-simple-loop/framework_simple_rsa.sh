@@ -10,7 +10,7 @@ cd /openipe/core/sim/rtl_sim/src-c/ipe-simple-loop
 cp main.c generated_main.c
 
 # remove original entry function from the generated file and replace it with the translator-generated one
-sed -i '/int IPE_ENTRY ipe_func(int a)/Q' generated_main.c
+sed -i '/int IPE_ENTRY apply_rsa(int rsa_operation, int text)/Q' generated_main.c
 cat output/main.c >> generated_main.c
 
 # run simulation

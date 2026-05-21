@@ -76,6 +76,19 @@ initial
 
       $write("waiting for main function..     ");
       @(r8==16'hDEAD);
+      $display("\t[OK]");
+
+      $write("waiting for IPE call..          ");
+      @(dut.ipe.ipe_executing);
+      $display("\t[OK]");
+
+      $write("waiting for IPE return..          ");
+      @(r8==16'hBEEF);
+      $display("\t[OK]");
+
+      $display("Value of r7: %h", r7);
+      if(r7 !== 16'h0)
+         tb_error("ERROR while passig the structure");
 
       stimulus_done = 1;
 

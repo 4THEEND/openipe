@@ -1,1 +1,1 @@
-int apply_rsa(int op, int text);
+int apply_rsa(int rsa_operation, int text);
