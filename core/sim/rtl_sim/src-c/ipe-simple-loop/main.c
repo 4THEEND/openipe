@@ -23,11 +23,17 @@ uint16_t IPE_FUNC modpow(uint16_t a, uint16_t e, uint16_t n){
 
     while(e > 0){
         // The branch we'll try to gain information on
-        if(e & 1){ result = multiply_mod(result, a, n); } 
-        else{ a = multiply_mod(a, a, n); }
-        e >>= 1;
+        if(e & 1){ 
+            result = multiply_mod(result, a, n); 
+            e--;
+        } 
+        else{ 
+            a = multiply_mod(a, a, n); 
+            e /= 2;
+        }
     }
-    return result;
+
+    return 0;
 }
 
 // Could be outside of ipe since only use non secret values
@@ -62,7 +68,7 @@ int main(void)
 
 int IPE_ENTRY apply_rsa(int rsa_operation, int text){
     if(rsa_operation == ENCODE){
-        return modpow(2, 2, 5);
+        return rsa_operation * text;
     } 
     else if(rsa_operation == DECODE)  {
         return rsa_decode(text);
