@@ -86,9 +86,9 @@ initial
       @(r8==16'hBEEF);
       $display("\t[OK]");
 
-      $display("Value of r7: %h", r7);
+      $display("Value of r7: %b", r7);
       if(r7 !== 16'h0)
-         tb_error("ERROR while passig the structure");
+         tb_error("ERROR while encoding");
 
       stimulus_done = 1;
 
