@@ -1,6 +1,7 @@
 #include <msp430.h>
 #include "../framework/libipe/ipe_support.h"
 #include "output/generated_ipe_header.h"
+#include "ssteper.h"
 
 DECLARE_IPE_STRUCT;
 
@@ -42,6 +43,8 @@ int main(void)
     WDTCTL = WDTPW | WDTHOLD; // Stop Watchdog
 
     asm __volatile__("mov %0, r8" ::"r"(0xdead) : "r8");
+    
+    init_ssteper();
 
     result = apply_otp(ENCODE, 0);
 

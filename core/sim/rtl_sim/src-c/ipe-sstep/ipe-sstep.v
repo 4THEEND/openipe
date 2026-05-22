@@ -78,6 +78,10 @@ initial
       @(r8==16'hDEAD);
       $display("\t[OK]");
 
+      $write("waiting for ssteper initialisation..     ");
+      @(r8==16'hCACA);
+      $display("\t[OK]");
+
       $write("waiting for IPE call..          ");
       @(dut.ipe.ipe_executing);
       $display("\t[OK]");
