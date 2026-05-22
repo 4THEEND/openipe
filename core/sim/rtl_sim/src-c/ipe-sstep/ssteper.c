@@ -1,5 +1,6 @@
 #include "ssteper.h"
 
+#define __IPE_CUSTOM_IVT
 
 #define RESET_TACTL (TA0CTL = TACLR | MC_0)
 #define ENABLE_TACTL (TA0CTL = TASSEL_2 | MC_1 | TACLR | TAIE)
@@ -25,10 +26,16 @@ void init_ssteper(void){
     return;
 }
 
+// __attribute__((naked)) is mandatory since we have a special way of handling isr with ipe
+__attribute__((naked, interrupt(16))) void TimerA_ISR(void){
+    asm __volatile__(
+        "push #0x8134\n\t" // Try to go directly there
+        
+        // INSERT PUSH HERE
 
-void __attribute__((interrupt(16))) TimerA_ISR(void){
-    RESET_TACTL;
-    asm __volatile__("mov %0, r8" ::"r"(0xABA) : "r8");
-    ENABLE_TACTL;
+        "push #0x8008\n\t"
+        "push #0x0000\n\t"
+        "reti"
+    );
 }
 
