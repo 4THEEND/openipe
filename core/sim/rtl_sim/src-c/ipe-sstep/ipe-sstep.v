@@ -86,6 +86,10 @@ initial
       @(dut.ipe.ipe_executing);
       $display("\t[OK]");
 
+      $write("waiting for interrupt handling..          ");
+      @(r8==16'hABA)
+      $display("\t[OK]");
+
       $write("waiting for IPE return..          ");
       @(r8==16'hBEEF);
       $display("\t[OK]");
