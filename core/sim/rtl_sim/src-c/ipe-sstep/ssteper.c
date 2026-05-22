@@ -1,7 +1,9 @@
 #include "ssteper.h"
 
 
-#define RESET_TACTL TACTL |= TACLR
+#define RESET_TACTL (TACTL |= TACLR)
+#define INIT_LATENCY 0xffff
+#define SSTEP_LATENCY 
 
 
 // Used to initiate timerA 
@@ -14,28 +16,28 @@ void init_ssteper(void){
         TACL: clears the module
         TAIE: enables sending interrupts when overflows
     */
-    TACTL = TASSEL_2 | MC_2 | TACLR | TAIE;
+    TA0CTL = TASSEL_2 | MC_2 | TACLR | TAIE;
 
     /*
         CCIE: we enable interrupts
     */
-    TACCTL0 = CCIE;
-    TACCR1 = 0xa;
+    TA0CCTL0 = CCIE;
+    TA0CCR0 = INIT_LATENCY;
+    RESET_TACTL;
 
     return;
 }
 
-
-void readTACCR0(void){
-    return;
-}
-
-#pragma vector=TIMERA0_VECTOR
+#pragma vector=TIMER0_A0_VECTOR
 __interrupt void timera0_isr(void){
 
     asm __volatile__("mov %0, r8" ::"r"(0xABA) : "r8");
-
-    readTACCR0();
+    
     RESET_TACTL;
 }
+
+
+// Useless ?
+#pragma vector=TIMER0_A1_VECTOR
+__interrupt void timera1_isr(void){}
 
