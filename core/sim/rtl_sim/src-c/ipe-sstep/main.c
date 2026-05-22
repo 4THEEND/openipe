@@ -41,6 +41,7 @@ int main(void)
 {
     uint16_t result;
     WDTCTL = WDTPW | WDTHOLD; // Stop Watchdog
+    __enable_interrupt();
 
     asm __volatile__("mov %0, r8" ::"r"(0xdead) : "r8");
     

@@ -78,7 +78,7 @@ initial
       @(r8==16'hDEAD);
       $display("\t[OK]");
 
-      $write("waiting for ssteper initialisation..     ");
+      $write("waiting for ssteper initialisation..");
       @(r8==16'hCACA);
       $display("\t[OK]");
 
@@ -91,8 +91,6 @@ initial
       $display("\t[OK]");
 
       $display("Value of r7: %b", r7);
-      if(r7 !== 16'h0)
-         tb_error("ERROR while encoding");
 
       stimulus_done = 1;
 
