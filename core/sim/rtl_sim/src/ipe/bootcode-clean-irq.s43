@@ -150,33 +150,12 @@ from_ipe:
     mov #0, r3
 
     push_all_regs
-
-    mov &IRQ_NUM, r15
-
-from_ipe_to_untrusted:
     ; we interrupted IPE and it will be handled in untrusted code
     clear_all_regs
 
-    ; save address of untrusted handler in IRQ_NUM
-    mov &IRQ_NUM, r10
-    add r10, r10 ; r10 = IRQ * 2
-    mov r10, r15
-    add #0xffe0, r15  ; get address from untrusted IVT
-    mov @r15, &IRQ_NUM
-
-    ; get trampoline function to jump to untrusted code
-    get_ipe_end r14
-    sub #0x20, r14
-    add r10, r14
-    mov @r14, r14 ; take address from IPE IVT ; TODO: update this comment
-
-    cmp #PMEM_BASE, r14
-    jlo invalid_isr_address
-    br r14
-
 from_untrusted:
     /*
-     * If we continue executing here, the interrupted code was unprotected
+     * If we continue executing here, the interrupted code was unprotected or we already cleaned the registers
      */
     push r15
     mov &IRQ_NUM, r15

@@ -47,7 +47,7 @@ int main(void)
     
     init_ssteper();
 
-    result = apply_otp(ENCODE, 0);
+    result = apply_otp(ENCODE, 1);
 
     asm __volatile__("mov %0, r7" :: "r"(result) : "r7"); 
     asm __volatile__("mov %0, r8" ::"r"(0xbeef) : "r8");   
