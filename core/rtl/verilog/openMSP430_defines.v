@@ -50,16 +50,10 @@
 // `define OMIT_IPE_FIXES  // do not include hardware fixes from the IPE Exposure paper (true IPE functionality)
 // `define OMIT_SP_SWITCHING  // do not automatically switch stack pointer when entering/exiting IPE (true IPE functionality)
 // `define HW_DISABLE_IPE_IRQ  // disable interrupts during IPE execution
-`define IRQ_CLEANER
 // `define SECURE_IRQ_SW  // secure interrupt handling: "software solution" with two IVTs
-// `define SECURE_IRQ_FW  // secure interrupt handling by using the firmware as a trusted component
+`define SECURE_IRQ_FW  // secure interrupt handling by using the firmware as a trusted component
 
 // secure interrupt handling implies additional protections
-`ifdef IRQ_CLEANER
-  `undef OMIT_IPE_FIXES
-  `undef OMIT_SP_SWITCHING
-`endif
-
 `ifdef SECURE_IRQ_SW
   `undef OMIT_IPE_FIXES
   `undef OMIT_SP_SWITCHING

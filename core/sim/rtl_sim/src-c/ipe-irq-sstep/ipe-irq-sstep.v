@@ -60,8 +60,8 @@ initial
       dma_verif_on = 0;
 
 
-      `ifndef IRQ_CLEANER
-         tb_error("====== This test needs to be run with the IRQ_CLEANER macro in openMSP430_defines! ======");
+      `ifndef SECURE_IRQ_FW
+         tb_error("====== This test needs to be run with the SECURE_IRQ_FW macro in openMSP430_defines! ======");
          $finish;
       `endif
 
