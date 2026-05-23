@@ -30,7 +30,11 @@ void init_ssteper(void){
 __attribute__((naked, interrupt(16))) void TimerA_ISR(void){
     //TODO: find a way to preserve registers
     asm __volatile__(
+        ".include \"../../bin/ipe_macros.asm\"\n\t"
         "pop r3\n\t"
+        "push_callee_save\n\t"
+        // TODO insert code there
+        "pop_callee_save\n\t"
         "push #0x8008\n\t"
         "push #0x0000\n\t"
         "reti"
