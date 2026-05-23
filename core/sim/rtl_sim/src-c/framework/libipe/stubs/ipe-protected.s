@@ -68,5 +68,5 @@ ipe_ocall:
     br #ipe_ocall_cont
 
 ocall_ret:
-    pop_all_regs
+    pop_all_regs ; Yeah it's just for interrupts return so we suppose there're no ocalls
     ret

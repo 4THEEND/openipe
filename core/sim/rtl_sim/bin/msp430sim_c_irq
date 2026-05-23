@@ -190,7 +190,7 @@ fi
 
 echo ""
 echo "\$ $MSPGCC_PFX-as      -alsm ../src/ipe/bootcode-clean-irq.s43 -o bootcode.o > bmem.l43"
-$MSPGCC_PFX-as      -alsm ../src/ipe/bootcode.s43 -o bootcode.o    > bmem.l43
+$MSPGCC_PFX-as      -alsm ../src/ipe/bootcode-clean-irq.s43 -o bootcode.o    > bmem.l43
 echo "\$ $MSPGCC_PFX-ld      -L$softdir -T $softdir/pmem.x bootcode.o -o bmem.elf"
 $MSPGCC_PFX-ld      -L$softdir -T $softdir/pmem.x   bootcode.o    -o bmem.elf
 echo "\$ $MSPGCC_PFX-objcopy -O ihex bmem.elf bmem.ihex"

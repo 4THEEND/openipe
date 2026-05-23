@@ -145,6 +145,10 @@ bootcode_isr:
 from_ipe:
     ; If we continue executing here, the interrupted code ran in IPE
     ; push registers to IPE stack and clear (this needs to be done in the same order as in the IPE calling conventions)
+    
+    pop r3
+    mov #0, r3
+
     push_all_regs
 
     mov &IRQ_NUM, r15
