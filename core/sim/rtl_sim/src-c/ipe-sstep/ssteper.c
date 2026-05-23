@@ -28,11 +28,9 @@ void init_ssteper(void){
 
 // __attribute__((naked)) is mandatory since we have a special way of handling isr with ipe
 __attribute__((naked, interrupt(16))) void TimerA_ISR(void){
+    //TODO: find a way to preserve registers
     asm __volatile__(
-        "push #0x8134\n\t" // Try to go directly there
-        
-        // INSERT PUSH HERE
-
+        "pop r3\n\t"
         "push #0x8008\n\t"
         "push #0x0000\n\t"
         "reti"

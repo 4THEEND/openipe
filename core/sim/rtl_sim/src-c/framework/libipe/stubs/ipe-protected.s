@@ -68,5 +68,5 @@ ipe_ocall:
     br #ipe_ocall_cont
 
 ocall_ret:
-    pop_callee_save
+    ; pop_callee_save
     ret

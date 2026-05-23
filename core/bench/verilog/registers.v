@@ -42,6 +42,7 @@
 
 wire       [15:0] r0    = dut.execution_unit_0.register_file_0.r0;
 wire       [15:0] r1    = dut.execution_unit_0.register_file_0.r1;
+wire       [15:0] r1_ipe= dut.execution_unit_0.register_file_0.r1_ipe;
 wire       [15:0] r2    = dut.execution_unit_0.register_file_0.r2;
 wire       [15:0] r3    = dut.execution_unit_0.register_file_0.r3;
 wire       [15:0] r4    = dut.execution_unit_0.register_file_0.r4;
