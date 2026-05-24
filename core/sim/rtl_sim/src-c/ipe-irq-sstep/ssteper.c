@@ -4,8 +4,9 @@
 #define TACTL_PARAMS_ENABLE (TASSEL_2 | MC_1 | TACLR | TAIE)
 #define ENABLE_TACTL (TA0CTL = TACTL_PARAMS_ENABLE)
 
-#define INIT_LATENCY 0x21
-#define SSTEP_LATENCY 0x100
+#define INIT_LATENCY 0xA
+#define SSTEP_LATENCY 0x50
+// Should be 2B
 
 #define BOOTCODE_HANDLING_LATENCY 0xA
 
@@ -34,16 +35,16 @@ __attribute__((naked, interrupt(16))) void TimerA_ISR(void){
         ".include \"../../bin/template_defs.asm\"\n\t"
  
         // HERE's the code to mesure
-        "mov &TAR, r4\n\t"
-        "sub %0, r4\n\t"
-        "mov #0xcacb, r5\n\t"
+        "mov &TAR, r11\n\t"
+        "sub %0, r11\n\t"
+        "mov #0xcacb, r12\n\t"
+        // Should find another way
 
         // Reset TimerA
         "mov %1, &TACCR0\n\t"
         "mov %2, &TACTL\n\t"
-        "push #0x8008\n\t"
-        "push #0x0008\n\t"
-        "reti" :: 
+        "reti"
+        :: 
             "i"(BOOTCODE_HANDLING_LATENCY) ,
             "i"(SSTEP_LATENCY), 
             "i"(TACTL_PARAMS_ENABLE):

@@ -145,15 +145,26 @@ bootcode_isr:
     jz from_untrusted
 
 from_ipe:
-    ; If we continue executing here, the interrupted code ran in IPE
-    ; push registers to IPE stack and clear (this needs to be done in the same order as in the IPE calling conventions)
-    
-    pop r3
-    mov #0, r3
-
-    push_all_regs
     ; we interrupted IPE and it will be handled in untrusted code
+    push_all_regs
     clear_all_regs
+
+    ; save address of untrusted handler in IRQ_NUM
+    mov &IRQ_NUM, r10
+    add r10, r10 ; r10 = IRQ * 2
+    mov r10, r15
+    add #0xffe0, r15  ; get address from untrusted IVT
+    mov @r15, &IRQ_NUM
+
+    ; get trampoline function to jump to untrusted code
+    get_ipe_end r14
+    sub #0x20, r14
+    add r10, r14
+    mov @r14, r14 ; take address of the IVT trampoline
+
+    cmp #PMEM_BASE, r14
+    jlo invalid_isr_address
+    br r14
 
 from_untrusted:
     /*

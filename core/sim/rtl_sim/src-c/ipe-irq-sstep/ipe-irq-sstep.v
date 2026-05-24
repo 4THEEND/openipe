@@ -88,18 +88,33 @@ initial
       @(r8==16'hCACA);
       $display("\t[OK]");
 
+      while(r8!==16'hBEEF)
+         begin
+            $write("waiting for the mesure          ");
+            @(r12==16'hCACB || r8== 16'hBEEF);
+            if(r8 !== 16'hBEEF)
+               begin
+                  $display("\t[OK]");
+                  if(r11 > 7)
+                     $display("Instruction outside of IPE interrupted");
+                  else
+                     $display("Time of the interrupted instr: %d", r11);
+               end
+            else 
+               $display("\t[OK]");
+         end
+
+      /*
       $write("waiting for IPE call..          ");
       @(dut.ipe.ipe_executing);
-      $display("\t[OK]");
+      $display("\t[OK]"); 
+      
 
       $write("waiting for the mesure          ");
-      @(r5==16'hCACB);
+      @(r12==16'hCACB);
       $display("\t[OK]");
-      $display("Time of the interrupted instr: %d", r4);
-
-      $write("waiting for IPE return..          ");
-      @(r8==16'hBEEF);
-      $display("\t[OK]");
+      $display("Time of the interrupted instr: %d", r11);
+      */
 
       $display("Value of r7: %b", r7);
 

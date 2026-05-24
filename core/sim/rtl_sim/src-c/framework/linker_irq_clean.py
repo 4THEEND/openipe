@@ -80,8 +80,8 @@ def main():
             if any(filename.endswith(ext) for ext in ['.s', '.asm', '.c']) and not root.endswith("templates") and not "irq" in filename:
                 libipe_files.append(os.path.join(root, filename))
 
-    # libipe_files.remove('../framework/libipe/stubs/ipe-protected.s')
-    # libipe_files.append('../framework/libipe/stubs/ipe-protected-clean-irq.s')
+    libipe_files.remove('../framework/libipe/stubs/ipe-protected.s')
+    libipe_files.append('../framework/libipe/stubs/ipe-protected-clean-irq.s')
 
     # Compile libipe objects and add them to the linker cmdline
     cc = 'msp430-gcc'
