@@ -9,7 +9,7 @@ LDFLAGS         = -L$(shell msp430-gcc -print-file-name="") -T pmem.x
 all: ${NAME}.elf
 
 ${NAME}.elf: ${OBJECTS}
-	../framework/linker.py $(LDFLAGS) -o $@ ${OBJECTS}
+	../framework/linker_irq_clean.py $(LDFLAGS) -o $@ ${OBJECTS}
 
 clean:
 	rm -f *.o *.elf *.ihex pmem.* output/*.o

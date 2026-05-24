@@ -92,6 +92,11 @@ initial
       @(dut.ipe.ipe_executing);
       $display("\t[OK]");
 
+      $write("waiting for the mesure          ");
+      @(r5==16'hCACB);
+      $display("\t[OK]");
+      $display("Time of the interrupted instr: %d", r4);
+
       $write("waiting for IPE return..          ");
       @(r8==16'hBEEF);
       $display("\t[OK]");

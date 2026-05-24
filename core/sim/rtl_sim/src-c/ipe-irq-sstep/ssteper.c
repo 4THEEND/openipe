@@ -1,11 +1,13 @@
 #include "ssteper.h"
 
-#define __IPE_CUSTOM_IVT
-
 #define RESET_TACTL (TA0CTL = TACLR | MC_0)
-#define ENABLE_TACTL (TA0CTL = TASSEL_2 | MC_1 | TACLR | TAIE)
-#define TIMER_LATENCY 0x50
-#define SSTEP_LATENCY 0xE
+#define TACTL_PARAMS_ENABLE (TASSEL_2 | MC_1 | TACLR | TAIE)
+#define ENABLE_TACTL (TA0CTL = TACTL_PARAMS_ENABLE)
+
+#define INIT_LATENCY 0x21
+#define SSTEP_LATENCY 0x100
+
+#define BOOTCODE_HANDLING_LATENCY 0xA
 
 
 // Used to initiate timerA 
@@ -14,7 +16,7 @@ void init_ssteper(void){
     /*
         CCIE: we enable interrupts
     */
-    TA0CCR0 = TIMER_LATENCY;
+    TA0CCR0 = INIT_LATENCY;
 
     /*
         TASSEL_2: TimerA is getting its clock from the submain clock
@@ -29,13 +31,22 @@ void init_ssteper(void){
 // __attribute__((naked)) is mandatory since we have a special way of handling isr with ipe
 __attribute__((naked, interrupt(16))) void TimerA_ISR(void){
     asm __volatile__(
-        "nop\n\t"
-        "nop\n\t"
-        "nop\n\t"
-        // TODO insert code there
+        ".include \"../../bin/template_defs.asm\"\n\t"
+ 
+        // HERE's the code to mesure
+        "mov &TAR, r4\n\t"
+        "sub %0, r4\n\t"
+        "mov #0xcacb, r5\n\t"
+
+        // Reset TimerA
+        "mov %1, &TACCR0\n\t"
+        "mov %2, &TACTL\n\t"
         "push #0x8008\n\t"
-        "push #0x0000\n\t"
-        "reti"
+        "push #0x0008\n\t"
+        "reti" :: 
+            "i"(BOOTCODE_HANDLING_LATENCY) ,
+            "i"(SSTEP_LATENCY), 
+            "i"(TACTL_PARAMS_ENABLE):
     );
 }
 

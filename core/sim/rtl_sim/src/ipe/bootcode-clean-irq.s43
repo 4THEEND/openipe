@@ -111,6 +111,8 @@ bootcode_isr_7:
     mov #7, &bootcode_irq_num
     jmp bootcode_isr
 bootcode_isr_8:
+    ; DISABLE TIMER: the irq handler should reenable it itself
+    mov #0, &TACTL
     mov #8, &bootcode_irq_num
     jmp bootcode_isr
 bootcode_isr_9:
@@ -163,6 +165,7 @@ from_untrusted:
     add #0xffe0, r15  ; get address from untrusted IVT
     mov @r15, &IRQ_NUM
     pop r15
+    
     cmp #PMEM_BASE, &IRQ_NUM
     jlo invalid_isr_address
     br &IRQ_NUM
