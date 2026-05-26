@@ -96,7 +96,7 @@ initial
                begin
                   $display("\t[OK]");
                   if(r11 > 7)
-                     $display("Instruction outside of IPE interrupted");
+                     $display("SSTEP latency is too small");
                   else
                      $display("Time of the interrupted instr: %d", r11);
                end

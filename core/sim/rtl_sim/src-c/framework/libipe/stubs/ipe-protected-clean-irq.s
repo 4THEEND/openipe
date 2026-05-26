@@ -92,12 +92,8 @@ isr_ret:
 ; IPE dispatcher for handling interrupts that happend during protected code execution
 irq_dispatch:
     mov #1, r4
+    mov @r15, r15
     br #untrusted_irq_caller
-
-
-irq_dispatch_ret:
-    clr r6
-    br #ecall_ret
 
 
 ; IPE-private interrupt vector table used to jump to unstrusted code.
