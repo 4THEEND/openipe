@@ -44,6 +44,7 @@ __attribute__((naked, interrupt(16))) void TimerA_ISR(void){
 
         // Transmit to monitor but should find another way
         "mov #0xcacb, r12\n\t"
+        "mov #0, r12\n\t"
 
         // No need to activate timerA again
         "cmp %1, %2\n\t"

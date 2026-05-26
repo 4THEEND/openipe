@@ -90,14 +90,19 @@ initial
 
       while(r8!==16'hBEEF)
          begin
+            $write("Waiting for IRQ");
+            @(tb_openMSP430.dut.irq == 16'h0100 || r8=== 16'hBEEF);
+            $display("\t[OK]");
+
             $write("waiting for the mesure          ");
-            @(r12==16'hCACB || r8== 16'hBEEF);
+            wait(r12==16'hCACB || r8 == 16'hBEEF);
+
             if(r8 !== 16'hBEEF)
                begin
                   $display("\t[OK]");
-                  if(r11 > 7)
+                  if(r11 > 7 && r12 == 0)
                      $display("SSTEP latency is too small");
-                  else
+                  else 
                      $display("Time of the interrupted instr: %d", r11);
                end
             else 
