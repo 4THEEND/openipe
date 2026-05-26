@@ -5,36 +5,8 @@
 
 DECLARE_IPE_STRUCT;
 
-#define ENCODE 0
-#define DECODE 1
 
-// In theory we're not supposed to use the same key twice but yeah 
-// In fact we're using a xor cipher rather than an otp but nvm it's otp on Z/2Z
 uint16_t IPE_VAR private_key = 0b0101010101010101;
-
-
-uint64_t IPE_FUNC custom_16_xor(uint16_t n, uint16_t m){
-    uint16_t result = 0;
-
-    for(int i = 0; i < 16; i++){
-        if((n & 1) != (m & 1)){
-            result += (1 << i);
-        }
-
-        n >>= 1;
-        m >>= 1;
-    }
-    return result;
-}
-
-uint16_t IPE_FUNC otp_encode(uint16_t plain){
-    return custom_16_xor(private_key, plain);
-}
-
-
-uint16_t IPE_FUNC otp_decode(uint16_t cipher){
-    return private_key ^ cipher;
-}
 
 
 int main(void)
@@ -47,7 +19,7 @@ int main(void)
     
     init_ssteper();
 
-    result = apply_otp(ENCODE, 1);
+    result = simple_branch(0b0101010101010101);
 
     asm __volatile__("mov %0, r7" :: "r"(result) : "r7"); 
     asm __volatile__("mov %0, r8" ::"r"(0xbeef) : "r8");   
@@ -59,14 +31,15 @@ int main(void)
     return 0;
 }
 
-uint16_t IPE_ENTRY apply_otp(int otp_operation, uint16_t text){
-    if(otp_operation == ENCODE){
-        return otp_encode(text);
-    } 
-    else if(otp_operation == DECODE)  {
-        return otp_decode(text);
+uint16_t IPE_ENTRY simple_branch(uint16_t entry){
+    int result = 0;
+    if(entry == private_key){
+        result += 5;
     } else {
-        return -1;
+        asm __volatile__( // Two branches have the same length
+            "nop\n\t"
+            "nop"
+        )
     }
+    return result;
 }
-

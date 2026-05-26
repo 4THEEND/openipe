@@ -15,7 +15,7 @@
 #define BOOTCODE_HANDLING_LATENCY 0xA
 
 // Should be > BOOTCODE_HANDLING_LATENCY + 1
-#define INIT_LATENCY 0x53 // Start of the custom xor
+#define INIT_LATENCY 0x29 // Start of the function we need to interrupt
 #define SSTEP_LATENCY 0x2B // Should be 2B when interrupting IPE
 
 #define NB_INSTR 10 // Number of consecutive instructions we want to interrupt

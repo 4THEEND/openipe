@@ -1,17 +1,14 @@
- __attribute__((section(".ipe_entry"))) uint16_t apply_otp_internal(int otp_operation, uint16_t text)
+ __attribute__((section(".ipe_entry"))) uint16_t simple_branch_internal(uint16_t entry)
 {
-  if (otp_operation == 0)
+  int result = 0;
+  if (entry == private_key)
   {
-    return otp_encode(text);
-  }
-  else
-    if (otp_operation == 1)
-  {
-    return otp_decode(text);
+    result += 5;
   }
   else
   {
-    return - 1;
+     asm __volatile__("nop\n\tnop");
   }
+  return result;
 }
 

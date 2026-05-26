@@ -15,8 +15,8 @@
     ;   sets r7 to the index of the entry function in the entry function table (see write_table.py)
     ; r7 used by "ipe_entry" stub in ipe_stubs.s
 
-    .global apply_otp
-apply_otp:
+    .global simple_branch
+simple_branch:
     push r7
     mov #0, r7
     call #ipe_entry

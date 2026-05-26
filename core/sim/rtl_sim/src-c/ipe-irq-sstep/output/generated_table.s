@@ -7,8 +7,8 @@
     ; table consulted at runtime by "ipe_entry" stub in ipe_stubs.s
 ecall_table:
 
-    .global apply_otp_internal
-    .word apply_otp_internal
+    .global simple_branch_internal
+    .word simple_branch_internal
     .word 0x8
 
 
