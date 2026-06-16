@@ -119,7 +119,7 @@ fi
 
 echo ""
 echo "\$ $MSPGCC_PFX-as      -alsm $2 -o $1.o > $1.l43"
-$MSPGCC_PFX-as      -alsm         $2     -o $1.o     > $1.l43
+$MSPGCC_PFX-as      -alsm    -I../../../../sdk/libipe/stubs     $2     -o $1.o     > $1.l43
 echo "\$ $MSPGCC_PFX-objdump -xdsStr $1.o >> $1.l43"
 $MSPGCC_PFX-objdump -xdsStr       $1.o              >> $1.l43
 echo "\$ $MSPGCC_PFX-ld      -T ./pmem.x $1.o -o $1.elf"

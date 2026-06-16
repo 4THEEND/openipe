@@ -189,7 +189,7 @@ echo "Compile, link & generate IHEX file (Program Memory: $pmemsize B, Data Memo
 echo "Compile, link & generate bootcode IHEX file (Bootcode Memory: $bmemsize B)"
 echo ""
 echo "\$ $MSPGCC_PFX-as      -alsm $firmware -o bootcode.o > bmem.l43"
-$MSPGCC_PFX-as      -alsm $firmware -o bootcode.o    > bmem.l43
+$MSPGCC_PFX-as      -alsm $firmware -I../../../../sdk/libipe/stubs -o bootcode.o    > bmem.l43
 echo "\$ $MSPGCC_PFX-ld      -T ./pmem.x bootcode.o -o bmem.elf"
 $MSPGCC_PFX-ld      -T ./pmem.x   bootcode.o    -o bmem.elf
 echo "\$ $MSPGCC_PFX-objcopy -O ihex bmem.elf bmem.ihex"

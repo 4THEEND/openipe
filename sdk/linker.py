@@ -10,7 +10,7 @@ from jinja2 import Template
 from common import *
 
 CC = "msp430-elf-gcc"
-FLAGS = ['-mmcu=msp430f149', '-mhwmult=none']
+FLAGS = ['-mmcu=msp430f149', '-mhwmult=none', f'-Wa,-I,{Path(os.path.dirname(__file__)).absolute()}/libipe/stubs']
 
 # Valid memory sizes — must match openMSP430_defines.v
 PMEM_SIZES = ['1K', '2K', '4K', '8K', '12K', '16K', '24K', '32K',
@@ -47,7 +47,7 @@ def _write_linker_script(pmem_size, dmem_size):
         f"BMEM_IVT_BASE = {bmem_ivt_base};\n"
         f"BMEM_TRAMPOLINE_BASE = {bmem_trampoline_base};\n"
     )
-    linker_x = get_libipe_path('../../../bin/ipe_linker.x')
+    linker_x = get_libipe_path('../../core/sim/rtl_sim/bin/ipe_linker.x')
     path = get_tmp(suffix='.x', prefix='pmem_')
     with open(path, 'w') as f:
         f.write(preamble + linker_x.read_text())

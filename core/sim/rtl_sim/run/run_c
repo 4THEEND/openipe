@@ -39,7 +39,7 @@ if [ $# -ne $EXPECTED_ARGS ]; then
     echo ""
     echo "Available tests:"
     echo -ne "                 "
-    ls ../src-c/
+    ls ../../../../app/
     echo ""
   exit 1
 fi
@@ -47,14 +47,14 @@ fi
 ###############################################################################
 #                     Check if the required files exist                       #
 ###############################################################################
-softdir=../src-c/$1;
+softdir=../../../../app/$1;
 
 if [ ! -e $softdir ]; then
     echo "ERROR: test directory doesn't exist: $softdir"
     echo ""
     echo "Available tests:"
     echo -ne "                 "
-    ls ../src-c/
+    ls ../../../../app/
     echo ""
     exit 1
 fi

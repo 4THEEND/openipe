@@ -1,4 +1,4 @@
-.include "../bin/ipe_macros.asm"
+.include "ipe_macros.s"
 .include "pmem_defs.asm"
 
     /*
