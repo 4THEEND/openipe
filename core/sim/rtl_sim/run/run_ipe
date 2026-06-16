@@ -32,6 +32,11 @@ LOG_DIR=./log
 rm -rf $LOG_DIR/*
 mkdir -p $LOG_DIR
 
+# When all IPE fixes are omitted, also omit SP switching so that attack_irq_exploit fires
+if [ -n "$__OMIT_IPE_FIXES" ]; then
+    export __OMIT_SP_SWITCHING=1
+fi
+
 export __IPE_SIM=1
 
 # IPE register behavior
@@ -89,27 +94,14 @@ __IPE_IRQ_FW=1 ../bin/msp430sim -firmware ../src/ipe/bootcode-fw-irq.s43 ipe/cas
 
 # Report regression results
 ../bin/parse_results $LOG_DIR
-
-FIRST_RES=$?
+result=$?
 
 rm -rf cov_work
 
-# Cleanup from previous regression
-LOG_DIR=./log
-rm -rf $LOG_DIR/*
-mkdir -p $LOG_DIR
-
-# Running attacks without the hardware fixes (expected to succeed and thus cause violations)
-export __OMIT_IPE_FIXES=1
-../bin/msp430sim ipe/ipe_sw_jump | tee $LOG_DIR/ipe_sw_jump.log
-../bin/msp430sim ipe/attack_ccc | tee $LOG_DIR/attack_ccc.log
-unset __OMIT_IPE_FIXES
-export __OMIT_SP_SWITCHING=1
-../bin/msp430sim ipe/attack_irq_exploit | tee $LOG_DIR/attack_irq_exploit.log
-
-# Report regression results
-../bin/parse_results $LOG_DIR
-
-if [ $? -ne 3 ] || [ $FIRST_RES -ne 0 ]; then
-    exit 1
+# With OMIT_IPE_FIXES, exactly 4 attack tests are expected to fail:
+# ipe_sw_jump, attack_ccc, attack_malicious_reti attack_nmi_handler
+if [ -n "$__OMIT_IPE_FIXES" ]; then
+    [ "$result" -eq 4 ] || exit 1
+else
+    [ "$result" -eq 0 ] || exit 1
 fi
