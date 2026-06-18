@@ -33,18 +33,18 @@ VERILOG_INCLUDES = \
     -I$(RTL_DIR)/periph \
     -I$(BENCH_DIR)
 
-EXTRA_IPE_FLAG=''
+EXTRA_IPE_FLAG=
 ifdef __OMIT_IPE_FIXES
-	EXTRA_IPE_FLAG+='-DOMIT_IPE_FIXES '
+	EXTRA_IPE_FLAG+= -DOMIT_IPE_FIXES
 endif
 ifdef __OMIT_SP_SWITCHING
-	EXTRA_IPE_FLAG+='-DOMIT_SP_SWITCHING '
+	EXTRA_IPE_FLAG+= -DOMIT_SP_SWITCHING
 endif
 ifdef __IPE_IRQ_SW
-	EXTRA_IPE_FLAG+='-DSECURE_IRQ_SW '
+	EXTRA_IPE_FLAG+= -DSECURE_IRQ_SW
 endif
 ifdef __IPE_IRQ_FW
-	EXTRA_IPE_FLAG+='-DSECURE_IRQ_FW '
+	EXTRA_IPE_FLAG += -DSECURE_IRQ_FW 
 endif
 
 DEPS = $(abspath main.cpp) \
@@ -66,7 +66,7 @@ $(VERILATOR_HDR): $(BENCH_DIR)/$(TOPLEVEL).v $(RTL_DIR)/openMSP430_defines.v FOR
 	    $(VERILOG_INCLUDES) \
 	    $(BENCH_DIR)/$(TOPLEVEL).v \
 	    $(DEPS) \
-		$(EXTRA_IPE_FLAGS) \
+		$(EXTRA_IPE_FLAG) \
 	    -o $(EXE_NAME)
 
 # ── Bootcode ──────────────────────────────────────────────────────────────────
