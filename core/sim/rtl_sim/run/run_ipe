@@ -32,11 +32,6 @@ LOG_DIR=./log
 rm -rf $LOG_DIR/*
 mkdir -p $LOG_DIR
 
-# When all IPE fixes are omitted, also omit SP switching so that attack_irq_exploit fires
-if [ -n "$__OMIT_IPE_FIXES" ]; then
-    export __OMIT_SP_SWITCHING=1
-fi
-
 export __IPE_SIM=1
 
 # IPE register behavior
@@ -98,10 +93,19 @@ result=$?
 
 rm -rf cov_work
 
-# With OMIT_IPE_FIXES, exactly 4 attack tests are expected to fail:
-# ipe_sw_jump, attack_ccc, attack_malicious_reti attack_nmi_handler
+# The number of expected test failures depends on which protections are disabled:
+#  * default (all fixes in place)  : no failures.
+#  * __OMIT_IPE_FIXES              : re-enables exactly 4 attacks (ipe_sw_jump,
+#                                    attack_ccc, attack_malicious_reti,
+#                                    attack_nmi_handler).
+#  * __OMIT_SP_SWITCHING           : re-enables exactly 1 attack that exploits
+#                                    the interrupt stack pointer (attack_irq_exploit).
 if [ -n "$__OMIT_IPE_FIXES" ]; then
-    [ "$result" -eq 4 ] || exit 1
+    expected=4
+elif [ -n "$__OMIT_SP_SWITCHING" ]; then
+    expected=1
 else
-    [ "$result" -eq 0 ] || exit 1
+    expected=0
 fi
+
+[ "$result" -eq "$expected" ] || exit 1
