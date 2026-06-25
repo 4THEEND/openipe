@@ -126,6 +126,7 @@ def main():
 
     files_to_compile = [get_libipe_path('stubs/' + default_config['entry_stub'])]
     files_to_compile.append(get_libipe_path('stubs/ipe-libc.c'))
+    files_to_compile.append(get_libipe_path('sim_io.c'))
 
     # write generated table file
     dic_stubs_entries = retrieve_stubs_entries(filenames)
