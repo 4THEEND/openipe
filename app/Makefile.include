@@ -1,4 +1,4 @@
-OPENIPE         = ../framework
+OPENIPE         = ../../sdk
 CC              = $(OPENIPE)/compiler.py
 LD              = $(OPENIPE)/linker.py
 

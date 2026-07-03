@@ -1,10 +1,4 @@
-;;;;; ugly hack to determine include path depending on C or ASM test
-
-.ifdef __IPE_CUSTOM_IVT
-    .include "../bin/ipe_macros.asm"
-.else
-    .include "../../bin/ipe_macros.asm"
-.endif
+.include "ipe_macros.s"
 
     ;; exported symbols
     .global ipe_ocall

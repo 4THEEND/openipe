@@ -8,6 +8,8 @@ services:
     working_dir: /openipe
     volumes:
       - ./core:/openipe/core
+      - ./app:/openipe/app
+      - ./sdk:/openipe/sdk
       - ./logs:/openipe/logs
       - ./scripts:/openipe/scripts
     command: "/bin/bash"
@@ -21,6 +23,8 @@ services:
     working_dir: /openipe
     volumes:
       - ./core:/openipe/core
+      - ./app:/openipe/app
+      - ./sdk:/openipe/sdk
       - ./logs:/openipe/logs
       - ./scripts:/openipe/scripts
     command: "/bin/bash"

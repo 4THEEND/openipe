@@ -1,5 +1,6 @@
 #include <msp430.h>
 #include "libipe/ipe_support.h"
+#include "libipe/sim_io.h"
 
 DECLARE_IPE_STRUCT;
 
@@ -17,18 +18,11 @@ int main(void)
     WDTCTL = WDTPW | WDTHOLD; // Stop Watchdog
 
     result = unprotected_mul(7, 8);
-    asm __volatile__("mov %0, r7" :: "r"(result) : "r7"); 
-    asm __volatile__("mov %0, r8" ::"r"(0xdead) : "r8");
+    ASSERT(result == 56, "unprotected_mul(7,8) == 56");
 
     result = mul(4, 5);
+    ASSERT(result == 20, "mul(4,5) == 20");
 
-    asm __volatile__("mov %0, r7" :: "r"(result) : "r7"); 
-    asm __volatile__("mov %0, r8" ::"r"(0xbeef) : "r8");
-    
-    while (1)
-    {
-        __no_operation();
-    }
-    return 0;
+    PASS();
 }
 

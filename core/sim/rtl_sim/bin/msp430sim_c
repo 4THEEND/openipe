@@ -61,9 +61,9 @@ fi
 ###############################################################################
 #                     Check if the required files exist                       #
 ###############################################################################
-softdir=../src-c/$1;
-elffile=../src-c/$1/$1.elf;
-verfile=../src-c/$1/$1.v;
+softdir=../../../../app/$1;
+elffile=../../../../app/$1/$1.elf;
+verfile=../../../../app/$1/$1.v;
 incfile=../../../rtl/verilog/openMSP430_defines.v;
 submitfile=../src/submit.f;
 if [ $OMSP_SIMULATOR == "isim" ]; then
@@ -190,7 +190,7 @@ fi
 
 echo ""
 echo "\$ $MSPGCC_PFX-as      -alsm ../src/ipe/bootcode.s43 -o bootcode.o > bmem.l43"
-$MSPGCC_PFX-as      -alsm ../src/ipe/bootcode.s43 -o bootcode.o    > bmem.l43
+$MSPGCC_PFX-as      -alsm ../src/ipe/bootcode.s43 -I../../../../sdk/libipe/stubs -o bootcode.o    > bmem.l43
 echo "\$ $MSPGCC_PFX-ld      -L$softdir -T $softdir/pmem.x bootcode.o -o bmem.elf"
 $MSPGCC_PFX-ld      -L$softdir -T $softdir/pmem.x   bootcode.o    -o bmem.elf
 echo "\$ $MSPGCC_PFX-objcopy -O ihex bmem.elf bmem.ihex"

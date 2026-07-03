@@ -37,38 +37,99 @@ jobs:
           path: /tmp/openipe-docker.tar
 
   ci-tests:
-    name: ${{ matrix.test-script }}
+    name: ${{ matrix.test }}${{ matrix.defines != '' && format(' ({0})', matrix.defines) || '' }}
     runs-on: ubuntu-latest
     needs: build-docker
     strategy:
       fail-fast: false
       matrix:
-        test-script: ["./scripts/regression_tests.sh", "./scripts/isolation_tests.sh", "./scripts/framework_hello.sh", "./scripts/framework_mul.sh", "./scripts/framework_rsa.sh", "./scripts/framework_attestation.sh", "./scripts/framework_hello.sh ; ./scripts/symbolic_ipe.sh", "./scripts/framework_hello.sh ; ./scripts/symbolic_firmware.sh"]
+        test: [regression-tests, isolation-tests]
+        defines: ["", "OMIT_IPE_FIXES", "OMIT_SP_SWITCHING"]
+        include:
+          - test: regression-tests
+            cmd: cd /openipe/core/sim/rtl_sim/run/ && ./run_all
+          - test: isolation-tests
+            cmd: cd /openipe/core/sim/rtl_sim/run/ && ./run_ipe
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          submodules: true
+      - uses: ./.github/actions/setup
+
+      - name: ${{ matrix.test }}${{ matrix.defines != '' && format(' ({0})', matrix.defines) || '' }}
+        uses: addnab/docker-run-action@v3
+        with:
+          image: openipe:latest
+          options: -v ${{ github.workspace }}/core:/openipe/core -v ${{ github.workspace }}/sdk:/openipe/sdk
+          run: ${{ matrix.defines != '' && format('export __{0}=1 && ', matrix.defines) || '' }}${{ matrix.cmd }}
+
+  symbolic-tests:
+    name: ${{ matrix.name }}
+    runs-on: ubuntu-latest
+    needs: build-docker
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: symbolic-ipe
+            cmd: ./scripts/symbolic_ipe.sh
+          - name: symbolic-firmware
+            cmd: ./scripts/symbolic_firmware.sh
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          submodules: true
+      - uses: ./.github/actions/setup
+
+      - name: ${{ matrix.name }}
+        uses: addnab/docker-run-action@v3
+        with:
+          image: openipe:latest
+          options: -v ${{ github.workspace }}/core:/openipe/core -v ${{ github.workspace }}/app:/openipe/app -v ${{ github.workspace }}/sdk:/openipe/sdk
+          run: ${{ matrix.cmd }}
+
+  generate-verilator-matrix:
+    name: Generate Verilator test matrix
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
     steps:
       - name: Check out repository
         uses: actions/checkout@v6
 
-      - name: Download Docker artifact
-        uses: actions/download-artifact@v8
+      - name: Discover ipe-* programs
+        id: set-matrix
+        run: |
+          programs=$(ls -d app/ipe-*/ 2>/dev/null \
+            | xargs -n1 basename \
+            | jq -R . | jq -cs .)
+          echo "matrix={\"program\":$programs}" >> "$GITHUB_OUTPUT"
+
+  verilator-tests:
+    name: verilator/${{ matrix.program }}
+    runs-on: ubuntu-latest
+    needs: [build-docker, generate-verilator-matrix]
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.generate-verilator-matrix.outputs.matrix) }}
+    steps:
+      - uses: actions/checkout@v6
         with:
-          name: openipe-docker
-          path: /tmp
+          submodules: true
+      - uses: ./.github/actions/setup
 
-      - name: Load Docker image
-        run: docker load --input /tmp/openipe-docker.tar
-
-      - name: Run ${{ matrix.test-script }}
+      - name: Simulate ${{ matrix.program }}
         uses: addnab/docker-run-action@v3
         with:
           image: openipe:latest
-          options: -v ${{ github.workspace }}/core:/openipe/core
-          run: ${{ matrix.test-script }}
+          options: -v ${{ github.workspace }}/core:/openipe/core -v ${{ github.workspace }}/app:/openipe/app -v ${{ github.workspace }}/sdk:/openipe/sdk -v ${{ github.workspace }}/scripts:/openipe/scripts
+          run: ./scripts/run_app.sh ${{ matrix.program }}
 
   push-image:
     name: Push Docker image
     runs-on: ubuntu-latest
-    # only run when build and ci-tests both succeed
-    needs: [build-docker, ci-tests]
+    # only run when build and all tests succeed
+    needs: [build-docker, ci-tests, symbolic-tests, verilator-tests]
     steps:
       - name: Download Docker artifact
         uses: actions/download-artifact@v8
@@ -99,5 +160,5 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v6
 
-      - name: Run a simple tests inside the container
-        run: docker compose run openipe ./scripts/framework_hello.sh
+      - name: Run a simple test inside the container
+        run: docker compose run openipe bash -c "cd /openipe/core/sim/rtl_sim/run/ && ./run_all"

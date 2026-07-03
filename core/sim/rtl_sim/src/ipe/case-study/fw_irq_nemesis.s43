@@ -1,7 +1,7 @@
 .include "pmem_defs.asm"
 
 .set __IPE_CUSTOM_IVT, 1
-.include "../src-c/framework/libipe/stubs/ipe-protected-fw-irq.s"
+.include "ipe-protected-fw-irq.s"
 
     .global main
     .sect .data

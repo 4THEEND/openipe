@@ -6,7 +6,7 @@ MEMORY {
   INFOMEM          : ORIGIN = 0x1000, LENGTH = 0x0100 /* END=0x10FF, size 256 as 2 128-byte segments */
   INFOA            : ORIGIN = 0x1080, LENGTH = 0x0080 /* END=0x10FF, size 128 */
   INFOB            : ORIGIN = 0x1000, LENGTH = 0x0080 /* END=0x107F, size 128 */
-  
+
   ROM (rx)         : ORIGIN = PMEM_BASE, LENGTH = PMEM_SIZE /* END=0xFFDF, size 61152 */
 
   bootcode  (rwx)   : ORIGIN = BMEM_BASE, LENGTH = BMEM_TOTAL_SIZE

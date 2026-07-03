@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
-import sys
+import argparse
 from pathlib import Path
 import json
-import argparse
 
 from elftools.elf.elffile import ELFFile
 from elftools.elf.sections import SymbolTableSection
@@ -11,11 +10,52 @@ from jinja2 import Template
 from common import *
 
 CC = "msp430-elf-gcc"
-FLAGS = ['-mmcu=msp430f149', '-mhwmult=none']
+FLAGS = ['-mmcu=msp430f149', '-mhwmult=none', f'-Wa,-I,{Path(os.path.dirname(__file__)).absolute()}/libipe/stubs']
+
+# Valid memory sizes — must match openMSP430_defines.v
+PMEM_SIZES = ['1K', '2K', '4K', '8K', '12K', '16K', '24K', '32K',
+              '41K', '48K', '51K', '54K', '55K']
+DMEM_SIZES = ['128', '256', '512', '1K', '2K', '4K', '5K',
+              '8K', '10K', '16K', '24K', '32K']
+
+# Fixed hardware constants — not configurable
+BMEM_SIZE = 1024
+PER_SIZE  = 4096
+
+def _parse_size(s):
+    s = s.strip()
+    if s.upper().endswith('K'):
+        return int(s[:-1]) * 1024
+    try:
+        return int(s, 0)
+    except ValueError:
+        raise argparse.ArgumentTypeError(f'invalid size: {s!r}')
+
+
+def _write_linker_script(pmem_size, dmem_size):
+    pmem_base            = 0x10000 - pmem_size
+    bmem_base            = PER_SIZE + dmem_size
+    bmem_ivt_base        = bmem_base + BMEM_SIZE - 0x24
+    bmem_trampoline_base = bmem_base + BMEM_SIZE - 0x4
+    preamble = (
+        f"PMEM_BASE = {pmem_base};\n"
+        f"PMEM_SIZE = {pmem_size};\n"
+        f"DMEM_SIZE = {dmem_size};\n"
+        f"PER_SIZE = {PER_SIZE};\n"
+        f"BMEM_BASE = {bmem_base};\n"
+        f"BMEM_TOTAL_SIZE = {BMEM_SIZE};\n"
+        f"BMEM_IVT_BASE = {bmem_ivt_base};\n"
+        f"BMEM_TRAMPOLINE_BASE = {bmem_trampoline_base};\n"
+    )
+    linker_x = get_libipe_path('../../core/sim/rtl_sim/bin/ipe_linker.x')
+    path = get_tmp(suffix='.x', prefix='pmem_')
+    with open(path, 'w') as f:
+        f.write(preamble + linker_x.read_text())
+    return path
 
 
 def get_libipe_path(subpath):
-    return Path(sys.argv[0]).resolve().parent / 'libipe' / subpath
+    return Path(__file__).resolve().parent / 'libipe' / subpath
 
 
 def retrieve_stubs_entries(files):
@@ -25,9 +65,9 @@ def retrieve_stubs_entries(files):
 
         'entries_names': [],
         'stubs_names': []
-    }   
+    }
 
-    for filename in files: 
+    for filename in files:
         with open(filename, 'rb') as f:
             elf_file = ELFFile(f)
             for section in elf_file.iter_sections():
@@ -58,34 +98,35 @@ def retrieve_stubs_entries(files):
                                 info(f"ecall found: {dic_stubs_entries['entries'][-1]}")
     return dic_stubs_entries
 
+
 def main():
-    parser = argparse.ArgumentParser(description='openIPE compiler')
-    parser.add_argument(
-        '--config-file',
-        dest='config_file',
-        default='config.json',
-        help='Path to the configuration file',
-    )
-    python_args, ld_args = parser.parse_known_args()
-    
-    # Extract non-option arguments (filenames)
-    filenames = [arg for arg in ld_args if arg.endswith('.o') and not arg.startswith('-')]
-    
-    default_config = {
-        'entry_stub': 'ipe-protected.s'
-    }
-    try:
-        with open(python_args.config_file) as config_json:
-            config = json.load(config_json)
-            for k in config:
-                default_config[k] = config[k]
-    except FileNotFoundError:
-        pass
+    parser = argparse.ArgumentParser(description='openIPE linker')
+    parser.add_argument('--pmem-size', choices=PMEM_SIZES, default='41K',
+                        metavar='SIZE', help='Program memory size (default: %(default)s)')
+    parser.add_argument('--dmem-size', choices=DMEM_SIZES, default='10K',
+                        metavar='SIZE', help='Data memory size (default: %(default)s)')
+    parser.add_argument('--config', type=Path, default=None,
+                        metavar='FILE', help='Config JSON file (default: config.json if present)')
+
+    args, cli_ld_args = parser.parse_known_args()
+
+    pmem_x = _write_linker_script(_parse_size(args.pmem_size), _parse_size(args.dmem_size))
+    cli_ld_args = [pmem_x if a == 'pmem.x' else a for a in cli_ld_args]
+
+    filenames = [arg for arg in cli_ld_args if arg.endswith('.o') and not arg.startswith('-')]
+
+    config_path = args.config if args.config is not None else Path('config.json')
+    if args.config is not None and not config_path.exists():
+        parser.error(f'config file not found: {config_path}')
+
+    default_config = {'entry_stub': 'ipe-protected.s'}
+    if config_path.exists():
+        default_config.update(json.loads(config_path.read_text()))
     info(f'Config used: {default_config}')
 
     files_to_compile = [get_libipe_path('stubs/' + default_config['entry_stub'])]
     files_to_compile.append(get_libipe_path('stubs/ipe-libc.c'))
-
+    files_to_compile.append(get_libipe_path('sim_io.c'))
 
     # write generated table file
     dic_stubs_entries = retrieve_stubs_entries(filenames)
@@ -99,7 +140,6 @@ def main():
         with open(files_to_compile[-1], "w") as target_file:
             target_file.write(table_template.render(table_obj))
 
-
     # write generated stubs
     files_to_compile.append(Path(get_tmp(suffix='.s', prefix='generated_stubs_')))
     with open(get_libipe_path('templates/generated_stubs.s')) as file:
@@ -111,19 +151,16 @@ def main():
         with open(files_to_compile[-1], "w") as target_file:
             target_file.write(stubs_template.render(stubs_obj))
 
-
     additional_files_to_link = []
     for file in files_to_compile:
-        out = get_tmp(suffix='.o',prefix=file.stem)
+        out = get_tmp(suffix='.o', prefix=file.stem)
         additional_files_to_link.append(out)
         call_prog(CC, FLAGS + ['-c', str(file), '-o', additional_files_to_link[-1]])
 
-
-    linker_args = ld_args
-    for object_name  in additional_files_to_link:
+    linker_args = cli_ld_args
+    for object_name in additional_files_to_link:
         last_obj_idx = max(idx for idx, val in enumerate(linker_args) if val.endswith('.o'))
         linker_args.insert(last_obj_idx + 1, object_name)
-
 
     call_prog(CC, linker_args)
 

@@ -12,7 +12,6 @@ initial
       repeat(5) @(posedge mclk);
       stimulus_done = 0;
 
-
       /* checkpoint 1 */
       @(r12 == 16'hCAFE);
       @(posedge dut.exec_done); // wait for branch to complete

@@ -9,7 +9,7 @@ main:
     mov #DMEM_220, r1
     mov #0xcafe, r12 ;; checkpoint 1
     mov #300, r14
-    call #ipe_wait
+    call #ipe_trampoline
     mov &dummy_struct, r15
 
     mov #0x800, &MPUIPSEGB1 ;; change boundaries
@@ -18,11 +18,11 @@ main:
 
     mov #0xbeef, r12 ;; checkpoint 2
     mov #300, r14
-    call #ipe_wait
+    call #ipe_trampoline
 
     mov #0xdead, r12 ;; checkpoint 3
     mov #300, r14
-    call #ipe_wait
+    call #ipe_trampoline
 
     mov #0, &MPUIPC0
     mov &dummy_struct, r15
@@ -30,7 +30,9 @@ main:
     br #end_of_test
 
         /* ----------------------         END OF TEST        --------------- */
-trampoline:
+ipe_trampoline:
+    br #ipe_wait
+ipe_ret:
     ret
 
 end_of_test:
@@ -48,7 +50,7 @@ l1:
     cmp #0, r14
     jnz l1
     clr r15
-    br #trampoline
+    br #ipe_ret
 
 
         /* ----------------------         INTERRUPT VECTORS  --------------- */

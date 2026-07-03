@@ -7,7 +7,7 @@ ARG DEBIAN_FRONTEND=noninteractive
 # Basic dependencies
 ################################################################################
 
-RUN apt-get update && apt-get install build-essential cmake iverilog tk expect-dev git python3 python3-pip python3-venv wget unzip -y
+RUN apt-get update && apt-get install build-essential cmake iverilog tk expect-dev git python3 python3-pip python3-venv wget unzip verilator -y
 RUN apt install python3-pyelftools
 
 # Install toolchain
@@ -22,7 +22,7 @@ ENV PATH="$PATH:/msp430-gcc/bin"
 ################################################################################
 
 RUN python3 -m venv openipe_venv
-COPY core/sim/rtl_sim/src-c/framework/requirements.txt .
+COPY sdk/requirements.txt .
 RUN  ./openipe_venv/bin/pip install -r requirements.txt && rm requirements.txt
 ENV PATH="/openipe_venv/bin:$PATH"
 
@@ -38,7 +38,7 @@ RUN ./venv/bin/pip install -r requirements.txt
 RUN cd angr-platforms && ../venv/bin/pip install .
 
 ################################################################################
-# Copy convenience scripts
+# Copy scripts
 ################################################################################
 
 WORKDIR /openipe
@@ -65,7 +65,7 @@ RUN echo '[ ! -z "$TERM" -a -r /etc/motd ] && cat /etc/motd' \
 \n\
 `lsb_release -d`\n\n\
 To get started, see <https://github.com/martonbognar/openipe>,\n\
-or have a look at the example programs under <core/sim/rtl_sim/src-c/ipe-hello/>.\n\
+or have a look at the example programs under <app/ipe-hello/>.\n\
 \n"\
 > /etc/motd
 
