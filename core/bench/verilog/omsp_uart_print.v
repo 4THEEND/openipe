@@ -29,6 +29,11 @@
 //
 // Elementary MMIO device to transform UART writes into stdout events.
 //
+// Origin: this peripheral was taken (more or less verbatim) from the
+// sancus-core project (https://github.com/sancus-tee/sancus-core), where it
+// was originally written based on Olivier Girard's `template_peripheral.v`
+// from openMSP430.
+//
 //----------------------------------------------------------------------------
 // $Rev$
 // $LastChangedBy$

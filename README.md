@@ -74,7 +74,8 @@ Run the unit tests that validate the security guarantees added by our extensions
 cd /openipe/core/sim/rtl_sim/run/ && ./run_ipe
 ```
 
-This performs two steps: first it runs the tests as expected (no leakage), then it runs some tests without the hardware fixes proposed in IPE Exposure to validate that this re-enables some vulnerabilities.
+By default this checks that no leakage occurs with all hardware fixes in place.
+Re-running with a protection disabled (`__OMIT_IPE_FIXES=1 ./run_ipe` or `__OMIT_SP_SWITCHING=1 ./run_ipe`) instead asserts that the expected IPE Exposure vulnerabilities are re-enabled.
 
 During the execution of the case study tests (#24-26), overhead measurements for the interrupt latencies are also provided.
 
@@ -95,11 +96,13 @@ During the execution of the case study tests (#24-26), overhead measurements for
 
 ### Attestation case study
 
-Run the framework on the attestation code adapted from VRASED, reporting on the total number of cycles elapsed:
+Run the framework on the attestation code adapted from VRASED, reporting the number of cycles elapsed in the protected IPE call:
 
 ```shell
-make -C /openipe/core/sim/verilator && make -C /openipe/app/ipe-hmac && /openipe/core/sim/verilator/build/ipe-sim --firmware /openipe/core/sim/verilator/build/bootcode.elf /openipe/app/ipe-hmac/ipe-hmac.elf
+./scripts/run_app.sh ipe-hmac
 ```
+
+This builds the Verilator simulator and the `ipe-hmac` application and runs it on the simulator; other applications under [`app/`](app) run the same way (e.g. `./scripts/run_app.sh ipe-hello`).
 
 ### Symbolic validation
 

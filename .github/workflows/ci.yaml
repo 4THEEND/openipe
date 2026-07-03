@@ -44,7 +44,7 @@ jobs:
       fail-fast: false
       matrix:
         test: [regression-tests, isolation-tests]
-        defines: ["", "OMIT_IPE_FIXES"]
+        defines: ["", "OMIT_IPE_FIXES", "OMIT_SP_SWITCHING"]
         include:
           - test: regression-tests
             cmd: cd /openipe/core/sim/rtl_sim/run/ && ./run_all
@@ -122,18 +122,8 @@ jobs:
         uses: addnab/docker-run-action@v3
         with:
           image: openipe:latest
-          options: -v ${{ github.workspace }}/core:/openipe/core -v ${{ github.workspace }}/app:/openipe/app -v ${{ github.workspace }}/sdk:/openipe/sdk
-          run: |
-            set -e
-            SIM_DIR=/openipe/core/sim/verilator
-            SRC_C=/openipe/app
-            PROG=${{ matrix.program }}
-            make -C "$SIM_DIR"
-            (cd "$SRC_C/$PROG" && make clean && make)
-            output=$("$SIM_DIR/build/ipe-sim" --firmware "$SIM_DIR/build/bootcode.elf" "$SRC_C/$PROG/$PROG.elf" 2>&1)
-            ret=$?
-            echo "$output"
-            if [ "$ret" -ne 0 ] || echo "$output" | grep -q "^FAIL"; then exit 1; fi
+          options: -v ${{ github.workspace }}/core:/openipe/core -v ${{ github.workspace }}/app:/openipe/app -v ${{ github.workspace }}/sdk:/openipe/sdk -v ${{ github.workspace }}/scripts:/openipe/scripts
+          run: ./scripts/run_app.sh ${{ matrix.program }}
 
   push-image:
     name: Push Docker image

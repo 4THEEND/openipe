@@ -6,17 +6,17 @@
     .sect .text
 main:
     mov #DMEM_220, r1
-    mov #0xcafe, r12 ;; checkpoint 1
+    mov #0xcafe, r13 ;; checkpoint 1
     mov #67, r14
-    call #ipe_wait
+    call #ipe_trampoline
 
     mov #0x800, &MPUIPSEGB1 ;; change boundaries
     mov #0x840, &MPUIPSEGB2 ;; change boundaries
     mov #0x0060, &MPUIPC0
 
-    mov #0xbeef, r12 ;; checkpoint 2
+    mov #0xbeef, r13 ;; checkpoint 2
     mov #67, r14
-    call #ipe_wait
+    call #ipe_trampoline
 
     br #end_of_test
 
@@ -25,6 +25,12 @@ end_of_test:
     nop
     br #0xffff
 
+ipe_trampoline:
+    mov r13, r12
+    br #ipe_wait
+ipe_ret:
+    ret
+
     .sect .ipe_seg, "a"
 dummy_struct:
     .word 1, 2, 3, 4
@@ -32,7 +38,7 @@ ipe_wait:
     dec r14
     cmp #0, r14
     jnz ipe_wait
-    ret
+    br #ipe_ret
 
 
         /* ----------------------         INTERRUPT VECTORS  --------------- */
