@@ -133,6 +133,7 @@ def main():
         files_to_compile.append(get_libipe_path('ipe-memory-dumb.c'))
     else:
         files_to_compile.append(get_libipe_path('ipe-memory.c'))
+    files_to_compile.append(get_libipe_path('sim_io.c'))
 
     # write generated table file
     dic_stubs_entries = retrieve_stubs_entries(filenames)

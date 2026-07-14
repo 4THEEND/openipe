@@ -4,9 +4,9 @@ on:
   # run on manual trigger
   workflow_dispatch:
   pull_request:
-  # trigger a cron job every monday at 8am
+  # trigger a cron job on the 1st of every month at 8am
   schedule:
-    - cron: "00 08 * * MON"
+    - cron: "00 08 1 * *"
 
 jobs:
   build-docker:
@@ -44,7 +44,7 @@ jobs:
       fail-fast: false
       matrix:
         test: [regression-tests, isolation-tests]
-        defines: ["", "OMIT_IPE_FIXES"]
+        defines: ["", "OMIT_IPE_FIXES", "OMIT_SP_SWITCHING"]
         include:
           - test: regression-tests
             cmd: cd /openipe/core/sim/rtl_sim/run/ && ./run_all
@@ -122,24 +122,15 @@ jobs:
         uses: addnab/docker-run-action@v3
         with:
           image: openipe:latest
-          options: -v ${{ github.workspace }}/core:/openipe/core -v ${{ github.workspace }}/app:/openipe/app -v ${{ github.workspace }}/sdk:/openipe/sdk
-          run: |
-            set -e
-            SIM_DIR=/openipe/core/sim/verilator
-            SRC_C=/openipe/app
-            PROG=${{ matrix.program }}
-            make -C "$SIM_DIR"
-            (cd "$SRC_C/$PROG" && make clean && make)
-            output=$("$SIM_DIR/build/ipe-sim" --firmware "$SIM_DIR/build/bootcode.elf" --pmem-size 49152 "$SRC_C/$PROG/$PROG.elf" 2>&1)
-            ret=$?
-            echo "$output"
-            if [ "$ret" -ne 0 ] || echo "$output" | grep -q "^FAIL"; then exit 1; fi
+          options: -v ${{ github.workspace }}/core:/openipe/core -v ${{ github.workspace }}/app:/openipe/app -v ${{ github.workspace }}/sdk:/openipe/sdk -v ${{ github.workspace }}/scripts:/openipe/scripts
+          run: ./scripts/run_app.sh ${{ matrix.program }}
 
   push-image:
     name: Push Docker image
     runs-on: ubuntu-latest
     # only run when build and all tests succeed
     needs: [build-docker, ci-tests, symbolic-tests, verilator-tests]
+    if: github.ref == 'refs/heads/main'
     steps:
       - name: Download Docker artifact
         uses: actions/download-artifact@v8
@@ -163,7 +154,7 @@ jobs:
           docker push ghcr.io/${{ github.repository_owner }}/openipe:latest
 
   check-docker-compose:
-    name: Check Docker Compose file
+    name: Check Docker Compose file on published image
     runs-on: ubuntu-latest
     needs: push-image
     steps:
