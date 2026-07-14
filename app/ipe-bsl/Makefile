@@ -1,10 +1,10 @@
 include ../Makefile.include
 
-NAME            = ipe-mul
+NAME            = ipe-bsl
 SOURCES         = $(shell ls *.c)
 OBJECTS         = $(SOURCES:.c=.o)
 
-LDFLAGS			+= --dmem-size 16K
+CFLAGS			+= -fomit-frame-pointer
 
 all: $(NAME).elf
 

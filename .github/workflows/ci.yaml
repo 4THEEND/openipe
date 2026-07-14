@@ -130,7 +130,7 @@ jobs:
             PROG=${{ matrix.program }}
             make -C "$SIM_DIR"
             (cd "$SRC_C/$PROG" && make clean && make)
-            output=$("$SIM_DIR/build/ipe-sim" --firmware "$SIM_DIR/build/bootcode.elf" "$SRC_C/$PROG/$PROG.elf" 2>&1)
+            output=$("$SIM_DIR/build/ipe-sim" --firmware "$SIM_DIR/build/bootcode.elf" --pmem-size 49152 "$SRC_C/$PROG/$PROG.elf" 2>&1)
             ret=$?
             echo "$output"
             if [ "$ret" -ne 0 ] || echo "$output" | grep -q "^FAIL"; then exit 1; fi

@@ -1,10 +1,10 @@
 include ../Makefile.include
 
-NAME            = ipe-mul
-SOURCES         = $(shell ls *.c)
+NAME            = ipe-main
+SOURCES         = main.c bigint.c
 OBJECTS         = $(SOURCES:.c=.o)
 
-LDFLAGS			+= --dmem-size 16K
+CFLAGS			+= -Os
 
 all: $(NAME).elf
 
