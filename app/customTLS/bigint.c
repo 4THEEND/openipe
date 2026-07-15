@@ -1377,7 +1377,6 @@ bigint *bi_mod_power(BI_CTX *ctx, bigint *bi, bigint *biexp)
         
         if (exp_bit_is_one(biexp, i))
         {
-            ipe_puts("[*] One pos bit :)"); 
             int l = i-window_size+1;
             int part_exp = 0;
 
@@ -1406,7 +1405,6 @@ bigint *bi_mod_power(BI_CTX *ctx, bigint *bi, bigint *biexp)
         }
         else    /* square it */
         {
-            ipe_puts("[*] One neg bit !!"); 
             biR = bi_residue(ctx, bi_square(ctx, biR));
             i--;
         }

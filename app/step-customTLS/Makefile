@@ -1,7 +1,7 @@
 include ../Makefile.include
 
 NAME            = step-customTLS
-SOURCES         = $(shell ls *.c)
+SOURCES         = $(shell ls *.c) ../customTLS/bigint.c
 OBJECTS         = $(SOURCES:.c=.o)
 
 CFLAGS			+= -Os

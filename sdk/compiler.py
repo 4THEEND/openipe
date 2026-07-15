@@ -111,32 +111,33 @@ class IPECollector(c_ast.NodeVisitor):
                 # if inlined function, we ignore it
                 self.inline_functions[function_name] = node
                 continue
-            for attribute in attributes_group.exprlist.exprs:
-                # attribute is a section attribute
-                if isinstance(attribute, c_ast.FuncCall):
-                    sectionName = attribute.args.exprs[0].value[1:-1]
-                    if sectionName == ".ipe_entry":
-                        self.ipe_functions[function_name] = node
-                        internal_name = function_name + "_internal"
-                        if (decl.type.args):
-                            v = ArgumentRegCounter()
-                            v.visit(decl.type.args)
-                            break_if_stack_passing(decl.type, v.reg_used)
-                        return_regs = ArgumentRegCounter.nb_reg_used(decl.type.type.type.names)           
-                        self.entry_functions.append({
-                            'internal_name': internal_name,
-                            'external_name': function_name,
-                            'index': self.index,
-                            'bitmap': hex(int(make_bitmap(return_regs), 2)),
-                        })
-                        self.entry_functions_names.append(function_name)
-                        self.index += 1
-                        # change declaration name not ecalls, because this way ecall from other file possible
-                        insert_ast_func_decl(self.ast, decl, suffix="")
-                        decl.type.type.declname = internal_name
+            if not isinstance(attributes_group, str):
+                for attribute in attributes_group.exprlist.exprs:
+                    # attribute is a section attribute
+                    if isinstance(attribute, c_ast.FuncCall):
+                        sectionName = attribute.args.exprs[0].value[1:-1]
+                        if sectionName == ".ipe_entry":
+                            self.ipe_functions[function_name] = node
+                            internal_name = function_name + "_internal"
+                            if (decl.type.args):
+                                v = ArgumentRegCounter()
+                                v.visit(decl.type.args)
+                                break_if_stack_passing(decl.type, v.reg_used)
+                            return_regs = ArgumentRegCounter.nb_reg_used(decl.type.type.type.names)           
+                            self.entry_functions.append({
+                                'internal_name': internal_name,
+                                'external_name': function_name,
+                                'index': self.index,
+                                'bitmap': hex(int(make_bitmap(return_regs), 2)),
+                            })
+                            self.entry_functions_names.append(function_name)
+                            self.index += 1
+                            # change declaration name not ecalls, because this way ecall from other file possible
+                            insert_ast_func_decl(self.ast, decl, suffix="")
+                            decl.type.type.declname = internal_name
 
-                    if sectionName == ".ipe_func":
-                        self.ipe_functions[function_name] = node
+                        if sectionName == ".ipe_func":
+                            self.ipe_functions[function_name] = node
     
     def visit_Decl(self, node):
         if isinstance(node.type, ext_c_parser.FuncDeclExt):

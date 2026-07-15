@@ -1,10 +1,11 @@
 include ../Makefile.include
 
 NAME            = customTLS
-SOURCES         = main.c bigint.c
+SOURCES         = $(shell ls *.c) ../customTLS/bigint.c
 OBJECTS         = $(SOURCES:.c=.o)
 
 CFLAGS			+= -Os
+
 
 all: $(NAME).elf
 

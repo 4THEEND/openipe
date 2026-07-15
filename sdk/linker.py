@@ -14,7 +14,8 @@ FLAGS = [
     '-mmcu=msp430f149', 
     '-mhwmult=none', 
     f'-Wa,-I,{Path(os.path.dirname(__file__)).absolute()}/libipe/stubs', 
-    '-Os'
+    '-Os',
+    '-D__extension__= '
 ]
 
 # Valid memory sizes — must match openMSP430_defines.v
