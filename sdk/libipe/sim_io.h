@@ -20,6 +20,14 @@ static inline int IPE_FUNC ipe_putchar(int c)
     return c;
 }
 
+
+static inline int putchar(int c)
+{
+    *UART_TXD = (uint8_t)c;
+    return c;
+}
+
+
 static inline int IPE_FUNC ipe_puts(const char *s)
 {
     while (*s) ipe_putchar(*s++);

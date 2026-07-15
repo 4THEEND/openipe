@@ -1,10 +1,11 @@
 include ../Makefile.include
 
-NAME            = ipe-step
+NAME            = step-random-branch
 SOURCES         = $(shell ls *.c)
 OBJECTS         = $(SOURCES:.c=.o)
 
 CFLAGS			+= -fomit-frame-pointer
+LDFLAGS			+= --ipe-step --init-latency 0x27 --nb-step 873
 
 all: $(NAME).elf
 
