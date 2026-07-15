@@ -1,11 +1,10 @@
 include ../Makefile.include
 
-NAME            = ipe-main
-SOURCES         = main.c bigint.c ipe-step.c
+NAME            = customTLS
+SOURCES         = main.c bigint.c
 OBJECTS         = $(SOURCES:.c=.o)
 
 CFLAGS			+= -Os
-LDFLAGS 		+= --dumb-memory-stub
 
 all: $(NAME).elf
 

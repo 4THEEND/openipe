@@ -344,7 +344,7 @@ bigint *bi_subtract(BI_CTX *ctx,
 /**
  * Perform a multiply between a bigint an an (unsigned) integer
  */
-static IPE_FUNC bigint *bi_int_multiply(BI_CTX *ctx, bigint *bia, comp b)
+static bigint *bi_int_multiply(BI_CTX *ctx, bigint *bia, comp b)
 {
     int j = 0, n = bia->size;
     bigint *biR = alloc(ctx, n + 1);
@@ -503,7 +503,7 @@ bigint *bi_divide(BI_CTX *ctx, bigint *u, bigint *v, int is_mod)
 /*
  * Perform an integer divide on a bigint.
  */
-static IPE_FUNC bigint *bi_int_divide(BI_CTX *ctx, bigint *biR, comp denom)
+static bigint *bi_int_divide(BI_CTX *ctx, bigint *biR, comp denom)
 {
     int i = biR->size - 1;
     long_comp r = 0;
@@ -625,7 +625,7 @@ bigint *bi_import(BI_CTX *ctx, const uint8_t *data, int size)
 
     for (i = size-1; i >= 0; i--)
     {
-        biR->comps[offset] += (comp)data[i] << (j*8);
+        biR->comps[offset] += data[i] << (j*8);
 
         if (++j == COMP_BYTE_SIZE)
         {
@@ -805,7 +805,7 @@ void bi_free_mod(BI_CTX *ctx, int mod_offset)
  * of the multiply. This routine gives Barrett its big performance
  * improvements over Classical/Montgomery reduction methods. 
  */
-static IPE_FUNC bigint *regular_multiply(BI_CTX *ctx, bigint *bia, bigint *bib, 
+static bigint *regular_multiply(BI_CTX *ctx, bigint *bia, bigint *bib, 
         int inner_partial, int outer_partial)
 {
     int i = 0, j;
@@ -821,6 +821,7 @@ static IPE_FUNC bigint *regular_multiply(BI_CTX *ctx, bigint *bia, bigint *bib,
 
     /* clear things to start with */
     memset(biR->comps, 0, ((n+t)*COMP_BYTE_SIZE));
+
     do 
     {
         long_comp tmp;
@@ -1060,7 +1061,7 @@ int bi_compare(bigint *bia, bigint *bib)
 /*
  * Allocate and zero more components.  Does not consume bi. 
  */
-static IPE_FUNC void more_comps(bigint *bi, int n)
+static void more_comps(bigint *bi, int n)
 {
     if (n > bi->max_comps)
     {
@@ -1080,7 +1081,7 @@ static IPE_FUNC void more_comps(bigint *bi, int n)
  * Make a new empty bigint. It may just use an old one if one is available.
  * Otherwise get one off the heap.
  */
-static IPE_FUNC bigint *alloc(BI_CTX *ctx, int size)
+static bigint *alloc(BI_CTX *ctx, int size)
 {
     bigint *biR;
 
@@ -1120,7 +1121,7 @@ static IPE_FUNC bigint *alloc(BI_CTX *ctx, int size)
  * Work out the highest '1' bit in an exponent. Used when doing sliding-window
  * exponentiation.
  */
-static int IPE_FUNC find_max_exp_index(bigint *biexp)
+static int find_max_exp_index(bigint *biexp)
 {
     int i = COMP_BIT_SIZE-1;
     comp shift = COMP_RADIX/2;
@@ -1145,7 +1146,7 @@ static int IPE_FUNC find_max_exp_index(bigint *biexp)
  * Is a particular bit is an exponent 1 or 0? Used when doing sliding-window
  * exponentiation.
  */
-static int IPE_FUNC exp_bit_is_one(bigint *biexp, int offset)
+static int exp_bit_is_one(bigint *biexp, int offset)
 {
     comp test = biexp->comps[offset / COMP_BIT_SIZE];
     int num_shifts = offset % COMP_BIT_SIZE;
@@ -1186,7 +1187,7 @@ static void check(const bigint *bi)
 /*
  * Delete any leading 0's (and allow for 0).
  */
-static IPE_FUNC bigint *trim(bigint *bi)
+static bigint *trim(bigint *bi)
 {
     check(bi);
 
@@ -1373,11 +1374,9 @@ bigint *bi_mod_power(BI_CTX *ctx, bigint *bi, bigint *biexp)
     /* if sliding-window is off, then only one bit will be done at a time and
      * will reduce to standard left-to-right exponentiation */
     do
-    {      
-        
+    {       
         if (exp_bit_is_one(biexp, i))
         {
-            ipe_puts("[*] One pos bit :)"); 
             int l = i-window_size+1;
             int part_exp = 0;
 
@@ -1406,7 +1405,6 @@ bigint *bi_mod_power(BI_CTX *ctx, bigint *bi, bigint *biexp)
         }
         else    /* square it */
         {
-            ipe_puts("[*] One neg bit !!"); 
             biR = bi_residue(ctx, bi_square(ctx, biR));
             i--;
         }

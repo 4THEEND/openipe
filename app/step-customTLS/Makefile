@@ -1,10 +1,11 @@
 include ../Makefile.include
 
-NAME            = ipe-step
+NAME            = step-customTLS
 SOURCES         = $(shell ls *.c)
 OBJECTS         = $(SOURCES:.c=.o)
 
-CFLAGS			+= -fomit-frame-pointer
+CFLAGS			+= -Os
+LDFLAGS 		+= --dumb-memory-stub --ipe-step --nb-step 15
 
 all: $(NAME).elf
 

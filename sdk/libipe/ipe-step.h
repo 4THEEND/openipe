@@ -16,7 +16,7 @@
 #endif
 
 #ifndef NB_INSTR
-#define NB_INSTR 260000 // Number of consecutive instructions we want to interrupt
+#define NB_INSTR 10 // Number of consecutive instructions we want to interrupt
 #endif
 
 void init_ssteper(void);

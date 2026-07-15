@@ -4,8 +4,6 @@ NAME            = ipe-mul
 SOURCES         = $(shell ls *.c)
 OBJECTS         = $(SOURCES:.c=.o)
 
-LDFLAGS			+= --dmem-size 16K
-
 all: $(NAME).elf
 
 $(NAME).elf: $(OBJECTS)

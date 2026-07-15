@@ -1,8 +1,9 @@
-#include "single-step.h"
+#include "ipe-step.h"
 
 #include <msp430.h>
-#include "libipe/ipe_support.h"
-#include "libipe/sim_io.h"
+
+#include "ipe_support.h"
+#include "sim_io.h"
 
 
 #define RESET_TACTL (TA0CTL = TACLR | MC_0)
@@ -15,7 +16,7 @@
 #define TACTL_PARAMS_ENABLE (TASSEL_2 | MC_1 | TACLR | TAIE)
 #define ENABLE_TACTL (TA0CTL = TACTL_PARAMS_ENABLE)
 
-uint16_t counter;
+uint32_t counter;
 
 // Used to initiate timerA 
 void init_ssteper(void){
@@ -41,28 +42,25 @@ __attribute__((naked, interrupt(9))) void TimerA_ISR(void){
         "mov r11, %1\n\t"
         ::  
             "i"(BOOTCODE_HANDLING_LATENCY),
-            "m"(timing):
+            "m"(timing)
+        : "r11"
     );
 
     puts("[*] Instruction timing:");
     // Works bcs cycles are btw 1 and 7
     putchar(48 + timing);
     puts("");
-    
-    asm __volatile__(
-        // No need to activate timerA again
-        "cmp %0, %1\n\t"
-        "jeq %=f\n\t"
 
-        // Reset TimerA
-        "mov %2, &TACCR0\n\t"
-        "mov %3, &TACTL\n\t"
-        "%=:\n\t"
-        "reti"
-        ::  
-            "i"(NB_INSTR),
-            "m"(counter),
+    if(counter < NB_INSTR){
+        asm __volatile__(
+            // Reset TimerA
+            "mov %0, &TACCR0\n\t"
+            "mov %1, &TACTL\n\t"
+            ::  
             "i"(SSTEP_LATENCY), 
             "i"(TACTL_PARAMS_ENABLE):
-    );
+        );
+    }
+
+    asm __volatile__("reti");
 }
