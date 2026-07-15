@@ -72,7 +72,7 @@ if [ ! -e $4 ]; then
 fi
 
 
-./gen_linker_def.sh $3 $4 $5 $6 $7 $8
+../bin/gen_linker_def.sh $3 $4 $5 $6 $7 $8
 
 ###############################################################################
 #                  Compile, link & generate IHEX file                         #
