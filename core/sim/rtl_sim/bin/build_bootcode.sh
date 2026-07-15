@@ -51,39 +51,9 @@ dos2unix pmem.sh
 fi
 source   pmem.sh
 
-cp ipe_linker.x pmem.x
-PMEM_BASE=$((0x10000-$pmemsize))
-STACK_INIT=$((persize+0x0080))
-BMEM_BASE=$((persize+dmemsize))
-BMEM_IVT_BASE=$((BMEM_BASE+bmemsize-0x24))
-BMEM_TRAMPOLINE_BASE=$((BMEM_BASE+bmemsize-0x4))
-sed -ie "s/PMEM_BASE/$PMEM_BASE/g"         pmem.x
-sed -ie "s/PMEM_SIZE/$pmemsize/g"         pmem.x
-sed -ie "s/BMEM_BASE/$BMEM_BASE/g"         pmem.x
-sed -ie "s/BMEM_IVT_BASE/$BMEM_IVT_BASE/g"         pmem.x
-sed -ie "s/BMEM_TRAMPOLINE_BASE/$BMEM_TRAMPOLINE_BASE/g"         pmem.x
-sed -ie "s/BMEM_TOTAL_SIZE/$bmemsize/g"         pmem.x
-sed -ie "s/DMEM_SIZE/$dmemsize/g"         pmem.x
-sed -ie "s/PER_SIZE/$persize/g"           pmem.x
-sed -ie "s/STACK_INIT/$STACK_INIT/g"       pmem.x
 
-# Compile bootcode firmware
-echo "Compile, link & generate bootcode IHEX file (Bootcode Memory: $bmemsize B)"
+./gen_linker_def.sh ipe_linker.x "../bin/template_defs.asm" $pmemsize $dmemsize $persize $bmemsize
 
-cp  "../bin/template_defs.asm"  ./pmem_defs.asm
-sed -ie "s/PMEM_SIZE/$pmemsize/g"         pmem_defs.asm
-sed -ie "s/PER_SIZE_HEX/$persize/g"       pmem_defs.asm
-sed -ie "s/BMEM_BASE_VAL/$BMEM_BASE/g" pmem_defs.asm
-sed -ie "s/BMEM_TOTAL_SIZE/$bmemsize/g"         pmem_defs.asm
-if [ $MSPGCC_PFX == "msp430-elf" ]; then
-    sed -ie "s/PER_SIZE/.data/g"           pmem_defs.asm
-    sed -ie "s/PMEM_BASE_VAL/.text/g"      pmem_defs.asm
-    sed -ie "s/PMEM_EDE_SIZE/0/g"          pmem_defs.asm
-else
-    sed -ie "s/PER_SIZE/$persize/g"       pmem_defs.asm
-    sed -ie "s/PMEM_BASE_VAL/$PMEM_BASE/g" pmem_defs.asm
-    sed -ie "s/PMEM_EDE_SIZE/$pmemsize/g" pmem_defs.asm
-fi
 
 echo ""
 echo "\$ $MSPGCC_PFX-as      -alsm ../src/ipe/$1 -o bootcode.o > bmem.l43"
